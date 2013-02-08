@@ -83,8 +83,7 @@ struct Data
     int inpaint_undefined;
     
     // extension
-    // int use_dir_field;
-    // double *DirField;
+    double *GivenGuidanceT;
 };
 
 class Heap  

@@ -37,7 +37,7 @@
 
 #define TYPE_N 0
 #define TYPE_C 1
-
+#define TYPE_D 2
 
 void *AllocMem(size_t n)
 {
@@ -157,6 +157,7 @@ void SetDefaults(Data *data)
     data->Tfield = NULL;
     data->Domain = NULL;
     data->MDomain = NULL;
+    data->GivenGuidanceT = NULL;
     
     data->lenSK1 = 0;
     data->lenSK2 = 0;
@@ -231,7 +232,7 @@ void ClearMemory(Data *data)
     {
         FreeMem( data->ordered_points );
         data->ordered_points = NULL;
-    }
+    }     
 }
 
 int GetMask( const mxArray *arg, Data *data)
@@ -429,7 +430,7 @@ int GetParam( const mxArray *arg, Data *data , int type)
             return err;
         }
     }
-    else
+    else if( type == TYPE_C)
     {
         if( min(mxGetM(arg),mxGetN(arg)) != 1 )
         {
@@ -492,9 +493,12 @@ int GetParam( const mxArray *arg, Data *data , int type)
                 data->convex[c] = paramlist[6+c]/sum;
         }
     }
+    else
+    {
+        data->GivenGuidanceT = paramlist;
+    }
     return err;
 }
-
 
 
 
@@ -708,7 +712,7 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                             break;
                         }
                                             
-                    case 'g': // guidanceN , guidanceC
+                    case 'g': // guidanceN , guidanceC , guidanceD
                         {
                             if( !guidance_done )
                             {
@@ -724,13 +728,20 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                                         err = GetParam( prhs[i+1], &data, TYPE_C);
                                         data.guidance = 1;
                                     }
+                                    else if( argname[len-1] == 'D' )
+                                    {
+                                        err = GetParam( prhs[i+1], &data, TYPE_D);
+                                        data.guidance = 2;
+                                    }
                                     else
                                         err = ERR_UNKNOWN_ID;
                                 }
                                 else
                                     err = ERR_ARG_MISSING;
                                 
-                                guidance_done = 1;
+                                // guidance_done = 1;
+                                if(data.GivenGuidanceT != NULL)
+                                    data.guidance = 2;
                             }
                             break;
                         }

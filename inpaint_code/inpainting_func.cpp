@@ -162,17 +162,21 @@ void inpaintPoint(Data *data,int xi,int xj)
     double W = 0;
     double Wk = 0;
     
-    
+    indexx = xj * data->rows + xi;
 	
 	//init Ihelp
 	for( c=0 ; c < data->channels ; c++ )
 		data->Ihelp[c] = 0;
 
     if( data->guidance == 1 )
-        Guidance(data,xi,xj,G);     
+        Guidance(data,xi,xj,G);
     
-    
-	indexx = xj * data->rows + xi;
+    if( data->guidance == 2 )
+    {
+        G[0] = data->GivenGuidanceT[indexx];
+        G[1] = data->GivenGuidanceT[indexx + data->size];
+        G[2] = data->GivenGuidanceT[indexx + 2*data->size];
+    }
     
 	for( yi = max(xi - data->radius,0); (yi <= xi + data->radius) && ( yi < data->rows); yi++)
 	{
@@ -195,7 +199,7 @@ void inpaintPoint(Data *data,int xi,int xj)
 				continue;
 
 			// compute weight
-            if(data->guidance == 1)
+            if(data->guidance != 0)
             {
                 z = (data->kappa)/(data->epsilon);
                 z = z * z;
@@ -215,8 +219,6 @@ void inpaintPoint(Data *data,int xi,int xj)
 			// average image values
 			for( c=0 ; c < data->channels ; c++ )
 				data->Ihelp[c] = data->Ihelp[c] + w * data->Image[indexy + c * data->size];
-			
-			
 		}
 	}
 	
