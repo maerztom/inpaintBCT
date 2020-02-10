@@ -596,7 +596,7 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     Data data;
 	mxArray *Im;
 	int nof_dim;
-    const int *elem_per_dim;
+    const mwSize *elem_per_dim;
     int nargout;
     int i;
 	
